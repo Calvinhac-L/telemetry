@@ -8,5 +8,5 @@ from fastapi import APIRouter
 root_router = APIRouter()
 
 @root_router.get("/")
-def get_hello_world():
-    return { "Hello World!" }
+def get_root():
+    return { "API is running" }
