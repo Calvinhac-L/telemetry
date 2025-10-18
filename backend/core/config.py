@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = ""
-    db_url: str = ""
+    database_url: str = ""
     debug: bool = False
 
     model_config = SettingsConfigDict(
@@ -17,3 +17,5 @@ class Settings(BaseSettings):
     )
 
 settings = Settings()
+
+print(settings.model_dump())
