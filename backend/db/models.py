@@ -13,5 +13,5 @@ class Telemetry(Base):
     id = Column(Integer, primary_key=True, index=True)
     timestamp = Column(DateTime, default=datetime.now(timezone.utc))
     source = Column(String, index=True)
-    metric_name = Column(String)
+    metric = Column(String)
     value = Column(Float)

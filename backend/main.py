@@ -11,9 +11,7 @@ from db.database import Base, engine
 
 app = FastAPI()
 
-try:
-    Path("telemetry.db").open()
-except FileNotFoundError:
+if not Path("telemetry.db").exists():
     Base.metadata.create_all(bind=engine)
 
 app.include_router(telemetry_router, tags=["Telemetry"])

@@ -15,7 +15,7 @@ telemetry_router = APIRouter()
 
 @telemetry_router.get("/telemetry", response_model=list[TelemetryRead])
 def list_telemetries(db: Session = Depends(get_database)):
-    return db.query(Telemetry).all()
+    return db.query(Telemetry).order_by(Telemetry.timestamp.desc()).all()
 
 @telemetry_router.post("/telemetry", response_model=TelemetryRead)
 def create_telemetry(telemetry: TelemetryCreate, db: Session = Depends(get_database)):

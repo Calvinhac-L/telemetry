@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 class TelemetryBase(BaseModel):
     source: str
-    metric_name: str
+    metric: str
     value: float
 
 class TelemetryCreate(TelemetryBase):
@@ -18,4 +18,4 @@ class TelemetryRead(TelemetryBase):
     timestamp: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
