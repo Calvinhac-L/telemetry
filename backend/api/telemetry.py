@@ -2,23 +2,25 @@
 Fichier de définition des routes exposées sur l'endpoint `/telemetry`
 """
 
-from datetime import datetime
-import uuid
-
 from fastapi import APIRouter
 
+from db.schemas import TelemetryRead, TelemetryCreate
 from db.models import Telemetry
+from db.database import get_database
+from sqlalchemy.orm import Session
+from fastapi import Depends
 
 
 telemetry_router = APIRouter()
 
-@telemetry_router.get("/telemetry", tags=["telemetry"])
-def get_telemetry():
-    today = datetime.now().date()
-    return {f"telemetry_{today}" : "TEST"}
+@telemetry_router.get("/telemetry", response_model=list[TelemetryRead])
+def list_telemetries(db: Session = Depends(get_database)):
+    return db.query(Telemetry).all()
 
-@telemetry_router.post("/telemetry", tags=["telemetry"])
-def add_telemetry(telemetry: Telemetry):
-    telemetry.id = uuid.uuid4()
-    telemetry.timestamp = datetime.now().timestamp()
-    return telemetry
+@telemetry_router.post("/telemetry", response_model=TelemetryRead)
+def create_telemetry(telemetry: TelemetryCreate, db: Session = Depends(get_database)):
+    db_telemetry = Telemetry(**telemetry.model_dump())
+    db.add(db_telemetry)
+    db.commit()
+    db.refresh(db_telemetry)
+    return db_telemetry
