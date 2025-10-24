@@ -14,7 +14,8 @@ def create_logger(file_path: str, logger_name: str):
     :param logger_name: Nom du logger.
     """
     logger = logging.getLogger(logger_name)
-    file_handler = logging.FileHandler(os.path.join(file_path, "pytest-logs" + ".log"), "w")
+    log_file = os.path.join(file_path, "pytest-logs.log")
+    file_handler = logging.FileHandler(log_file, mode="w", encoding="utf-8")
     file_handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)s | %(message)s"))
     file_handler.setLevel(logger.getEffectiveLevel())
     logger.addHandler(file_handler)

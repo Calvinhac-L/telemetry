@@ -60,7 +60,7 @@ class RstGenerator:
         """
         Ajoute un tableau d'en-tête à une colonne.
         """
-        if len(widths) != 1:
+        if len(widths) != 2:
             raise ValueError("Le tableau doit avoir exactement une colonne.")
 
         table = self._init_new_table(title, widths)

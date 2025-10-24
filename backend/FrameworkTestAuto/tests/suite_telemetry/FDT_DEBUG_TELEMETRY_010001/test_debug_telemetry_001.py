@@ -43,7 +43,7 @@ class TestDebugTelemetry001:
 
         self.fwt.execute_scenario(Scenario(actions, verifs), "Vérification de la mise en place du framework")
 
-    def teardown_classe(self) -> None:
+    def teardown_class(self) -> None:
         """
         Classe générique de finalisation des tests.
         """
