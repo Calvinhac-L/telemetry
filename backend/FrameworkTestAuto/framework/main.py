@@ -13,7 +13,7 @@ from framework.rst.header import Header
 
 
 class FrameworkTestAuto:
-    def _init__(self):
+    def __init__(self):
         """
         Constructeur et routine de début d'exécution d'une feuille de tests.
         """

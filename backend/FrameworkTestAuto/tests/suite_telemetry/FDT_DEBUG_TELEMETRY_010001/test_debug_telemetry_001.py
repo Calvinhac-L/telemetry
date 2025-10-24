@@ -3,7 +3,7 @@ Fichier de debug de la suite de tests autos
 """
 
 from framework.models.action import Action
-from FrameworkTestAuto.framework.models.comparison import Comparison
+from framework.models.comparison import Comparison
 from framework.models.scenario import Scenario
 from framework.main import FrameworkTestAuto
 from framework.rst.header import Header
@@ -15,6 +15,12 @@ class TestDebugTelemetry001:
     """
 
     fwt: FrameworkTestAuto
+
+    def setup_class(self) -> None:
+        """
+        Classe générique d'initialisation des tests.
+        """
+        self.fwt = FrameworkTestAuto()
 
     def test_headers(self) -> None:
         """
@@ -36,3 +42,9 @@ class TestDebugTelemetry001:
         verifs: list[Comparison] = [Comparison(True, "==", True, "L'exécution s'est bien déroulée")]
 
         self.fwt.execute_scenario(Scenario(actions, verifs), "Vérification de la mise en place du framework")
+
+    def teardown_classe(self) -> None:
+        """
+        Classe générique de finalisation des tests.
+        """
+        self.fwt.finish_test()

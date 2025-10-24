@@ -18,7 +18,7 @@ class BaseInterface:
         """
         Comparateur d'égalité entre deux instances de modèles.
         """
-        return self == other
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
 
     def __contains__(self, item: object) -> bool:
         """
