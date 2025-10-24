@@ -1,4 +1,4 @@
-﻿"""
+"""
 Fichier de définition des routes exposées sur l'endpoint `/telemetry`
 """
 
@@ -12,9 +12,11 @@ from services import telemetry_service
 
 telemetry_router = APIRouter()
 
+
 @telemetry_router.get("/telemetry", response_model=list[TelemetryRead])
 def list_telemetries(db: Session = Depends(get_database)):
     return telemetry_service.list_telemetries(db)
+
 
 @telemetry_router.post("/telemetry", response_model=TelemetryRead)
 def create_telemetry(telemetry: TelemetryCreate, db: Session = Depends(get_database)):

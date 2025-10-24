@@ -1,4 +1,4 @@
-﻿"""
+"""
 Modèles ORM de la base de données SQLite
 """
 
@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Column, DateTime, Float, Integer, String
 
 from db.database import Base
+
 
 class Telemetry(Base):
     __tablename__ = "telemetry"

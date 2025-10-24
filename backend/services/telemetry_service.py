@@ -1,20 +1,20 @@
-﻿"""
+"""
 Fichier de gestion de la logique métier du service Telemetry
 """
 
-from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from db.database import get_database
 from db.models import Telemetry
 from db.schemas import TelemetryCreate
 
 ALLOWED_METRICS = {"temperature", "altitude", "speed"}
 
-def list_telemetries(db: Session):
+
+def list_telemetries(db: Session) -> list[Telemetry]:
     return db.query(Telemetry).order_by(Telemetry.timestamp.desc()).all()
 
-def create_telemetry(db: Session, telemetry: TelemetryCreate):
+
+def create_telemetry(db: Session, telemetry: TelemetryCreate) -> Telemetry:
     if telemetry.metric.lower() not in ALLOWED_METRICS:
         raise ValueError(f"Métrique non autorisée: {telemetry.metric}")
 
