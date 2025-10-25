@@ -1,13 +1,18 @@
-﻿"""
-Modèles de données
+"""
+Modèles ORM de la base de données SQLite
 """
 
-from uuid import UUID
-from pydantic import BaseModel
+from datetime import datetime, timezone
+from sqlalchemy import Column, DateTime, Float, Integer, String
 
-class Telemetry(BaseModel):
-    id: UUID | None = None
-    timestamp: float | None = None
-    source: str
-    metric_name: str
-    value: str
+from db.database import Base
+
+
+class Telemetry(Base):
+    __tablename__ = "telemetry"
+
+    id = Column(Integer, primary_key=True, index=True)
+    timestamp = Column(DateTime, default=datetime.now(timezone.utc))
+    source = Column(String, index=True)
+    metric = Column(String)
+    value = Column(Float)
