@@ -17,6 +17,10 @@ telemetry_router = APIRouter()
 def list_telemetries(db: Session = Depends(get_database)):
     return telemetry_service.list_telemetries(db)
 
+@telemetry_router.get("/telemetry/latest", response_model=list[TelemetryRead])
+def get_latest(db: Session = Depends(get_database), n: int = 1):
+    return telemetry_service.get_latest(db, n)
+
 
 @telemetry_router.post("/telemetry", response_model=TelemetryRead)
 def create_telemetry(telemetry: TelemetryCreate, db: Session = Depends(get_database)):
