@@ -2,7 +2,7 @@
 Fichier de définition des routes exposées sur l'endpoint `/telemetry`
 """
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from db.database import get_database
@@ -18,7 +18,10 @@ def list_telemetries(db: Session = Depends(get_database)):
     return telemetry_service.list_telemetries(db)
 
 @telemetry_router.get("/telemetry/latest", response_model=list[TelemetryRead])
-def get_latest(db: Session = Depends(get_database), n: int = 1):
+def get_latest(db: Session = Depends(get_database), n: int = Query(1, ge=1, le=100)):
+    """
+    Retourne les N dernières entrées de télémétrie (max 100 pour éviter une requête trop lourde)
+    """
     return telemetry_service.get_latest(db, n)
 
 
