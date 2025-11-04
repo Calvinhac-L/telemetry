@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    app_name: str = ""
+    app_name: str = "Yathzee API"
     database_url: str = ""
     debug: bool = False
 

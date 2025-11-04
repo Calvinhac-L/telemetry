@@ -6,19 +6,16 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
-class TelemetryBase(BaseModel):
-    source: str
-    metric: str
-    value: float
+class UserBase(BaseModel):
+    username: str
+    email: str
 
-
-class TelemetryCreate(TelemetryBase):
+class UserCreate(UserBase):
     pass
 
-
-class TelemetryRead(TelemetryBase):
+class UserRead(UserBase):
     id: int
-    timestamp: datetime
+    created_at: datetime
 
     class Config:
         from_attributes = True
