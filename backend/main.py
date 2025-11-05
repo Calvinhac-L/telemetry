@@ -4,6 +4,7 @@ Fichier principal d'exécution de FastAPI
 
 from pathlib import Path
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from api.user import user_router
 from api.ws import ws_router
@@ -12,6 +13,13 @@ from api.game import game_router
 from db.database import Base, engine
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 if not Path("yathzee.db").exists():
     Base.metadata.create_all(bind=engine)

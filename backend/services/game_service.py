@@ -1,4 +1,4 @@
-﻿"""
+"""
 Fichier de gestion de la logique d'une session de jeu
 """
 
@@ -10,6 +10,7 @@ import collections
 
 from db.models import GameSession, User
 from db.schemas import GameState
+
 
 class CategoriesEnum(Enum):
     ONES = "ones"
@@ -26,12 +27,14 @@ class CategoriesEnum(Enum):
     YAHTZEE = "yahtzee"
     CHANCE = "chance"
 
+
 class Game:
     game: GameSession
     state: GameState
     db: Session
     game_id: Optional[int]
     user_id: Optional[int]
+
     def __init__(self, db: Session, game_id: Optional[int] = None):
         self.db = db
         self.game_id = game_id
@@ -67,8 +70,8 @@ class Game:
 
         self.game = game
         # Accès aux valeurs via __dict__
-        self.game_id = game.__dict__['id']
-        self.user_id = game.__dict__['user_id']
+        self.game_id = game.__dict__["id"]
+        self.user_id = game.__dict__["user_id"]
         return game
 
     def _load_game(self, game_id: Optional[int]):
@@ -86,22 +89,22 @@ class Game:
             rolls_left=game.state.get("rolls_left"),
             round=game.state.get("round"),
             scores=game.state.get("scores"),
-            total_score=game.state.get("total_score")
+            total_score=game.state.get("total_score"),
         )
 
     # ----------------------------------------------------------------------
     # Lancer les dés
     # ----------------------------------------------------------------------
 
-    def _roll_dice(self, dice_to_reroll: Optional[List[int]] = None):
-        if dice_to_reroll is None:
+    def _roll_dice(self, locked_dice: Optional[List[int]] = None):
+        if locked_dice is None:
             self.state.dice_values = [randint(1, 6) for _ in range(5)]
         else:
-            for idx in dice_to_reroll:
-                if 0 <= idx < 5:
+            for idx in range(5):
+                if idx not in locked_dice:
                     self.state.dice_values[idx] = randint(1, 6)
 
-    def roll(self, dice_to_reroll: Optional[List[int]] = None) -> GameSession:
+    def roll(self, locked_dice: Optional[List[int]] = None) -> GameSession:
         """
         Effectue un lancer de dés (ou une relance).
         """
@@ -111,7 +114,7 @@ class Game:
         if self.state.rolls_left <= 0:
             raise ValueError("No rolls left in this turn")
 
-        self._roll_dice(dice_to_reroll)
+        self._roll_dice(locked_dice)
         self.state.rolls_left -= 1
 
         self._save_state()
@@ -158,11 +161,11 @@ class Game:
     def _save_state(self):
         # Assurons-nous que l'état est sérialisé en dictionnaire
         state_dict = {
-            'dice_values': self.state.dice_values,
-            'rolls_left': self.state.rolls_left,
-            'round': self.state.round,
-            'scores': self.state.scores,
-            'total_score': self.state.total_score
+            "dice_values": self.state.dice_values,
+            "rolls_left": self.state.rolls_left,
+            "round": self.state.round,
+            "scores": self.state.scores,
+            "total_score": self.state.total_score,
         }
         self.game.state = state_dict
         self.db.add(self.game)
@@ -183,10 +186,7 @@ class Game:
         Liste toutes les parties d'un utilisateur.
         """
         return (
-            db.query(GameSession)
-            .filter(GameSession.user_id == user_id)
-            .order_by(GameSession.created_at.desc())
-            .all()
+            db.query(GameSession).filter(GameSession.user_id == user_id).order_by(GameSession.created_at.desc()).all()
         )
 
     # ----------------------------------------------------------------------
@@ -227,15 +227,15 @@ class Game:
         if category == "fours":
             return sum(d for d in dice if d == 4)
         if category == "fives":
-             return sum(d for d in dice if d == 5)
+            return sum(d for d in dice if d == 5)
         if category == "sixes":
-             return sum(d for d in dice if d == 6)
+            return sum(d for d in dice if d == 6)
         if category == "three_of_a_kind":
-             return sum(dice) if cls._is_n_of_a_kind(dice, 3) else 0
+            return sum(dice) if cls._is_n_of_a_kind(dice, 3) else 0
         if category == "four_of_a_kind":
-             return sum(dice) if cls._is_n_of_a_kind(dice, 4) else 0
+            return sum(dice) if cls._is_n_of_a_kind(dice, 4) else 0
         if category == "full_house":
-             return 25 if cls._is_full_house(dice) else 0
+            return 25 if cls._is_full_house(dice) else 0
         if category == "small_straight":
             return 30 if cls._is_small_straight(dice) else 0
         if category == "large_straight":

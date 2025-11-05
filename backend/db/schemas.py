@@ -11,8 +11,10 @@ class UserBase(BaseModel):
     username: str
     email: str
 
+
 class UserCreate(UserBase):
     pass
+
 
 class UserRead(UserBase):
     id: int
@@ -21,6 +23,7 @@ class UserRead(UserBase):
     class Config:
         from_attributes = True
 
+
 class GameState(BaseModel):
     dice_values: list[int]
     rolls_left: int
@@ -28,8 +31,10 @@ class GameState(BaseModel):
     scores: dict[str, Optional[int]]
     total_score: int
 
+
 class GameCreate(BaseModel):
     user_id: int
+
 
 class GameRead(BaseModel):
     id: int
@@ -45,8 +50,10 @@ class GameRead(BaseModel):
     def game_state(self) -> GameState:
         return GameState(**self.state)
 
+
 class RollRequest(BaseModel):
-    dice_to_reroll: Optional[list[int]] = None
+    locked_dice: Optional[list[int]] = None
+
 
 class ChooseScoreRequest(BaseModel):
     category: str
