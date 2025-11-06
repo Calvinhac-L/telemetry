@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -12,14 +11,10 @@ interface DiceProps {
 
 export const Dice = ({
     value,
+    locked,
     onToggle
 }: DiceProps) => {
-    const [locked, setLocked] = useState(false);
-
-    const toggleLock = () => {
-        setLocked(!locked)
-        onToggle?.(!locked)
-    }
+    const toggleLock = () => onToggle?.(!locked);
 
     return (
         <motion.div

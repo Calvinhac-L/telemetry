@@ -30,6 +30,7 @@ class GameState(BaseModel):
     round: int
     scores: dict[str, Optional[int]]
     total_score: int
+    locked_dice: list[int] = []
 
 
 class GameCreate(BaseModel):

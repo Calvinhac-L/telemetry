@@ -90,6 +90,7 @@ class Game:
             round=game.state.get("round"),
             scores=game.state.get("scores"),
             total_score=game.state.get("total_score"),
+            locked_dice=game.state.get("locked_dice"),
         )
 
     # ----------------------------------------------------------------------
@@ -97,6 +98,7 @@ class Game:
     # ----------------------------------------------------------------------
 
     def _roll_dice(self, locked_dice: Optional[List[int]] = None):
+        self.state.locked_dice = locked_dice or []
         if locked_dice is None:
             self.state.dice_values = [randint(1, 6) for _ in range(5)]
         else:
@@ -150,6 +152,7 @@ class Game:
         else:
             self.state.rolls_left = 3
             self.state.dice_values = [0, 0, 0, 0, 0]
+            self.state.locked_dice = []
 
         self._save_state()
         return self.game
@@ -166,6 +169,7 @@ class Game:
             "round": self.state.round,
             "scores": self.state.scores,
             "total_score": self.state.total_score,
+            "locked_dice": self.state.locked_dice,
         }
         self.game.state = state_dict
         self.db.add(self.game)
@@ -233,7 +237,7 @@ class Game:
         if category == "three_of_a_kind":
             return sum(dice) if cls._is_n_of_a_kind(dice, 3) else 0
         if category == "four_of_a_kind":
-            return sum(dice) if cls._is_n_of_a_kind(dice, 4) else 0
+            return 40 if cls._is_n_of_a_kind(dice, 4) else 0
         if category == "full_house":
             return 25 if cls._is_full_house(dice) else 0
         if category == "small_straight":

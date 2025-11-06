@@ -4,15 +4,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import { Item } from "@/components/ui/item"
 import { API_URL } from "@/lib/api";
 import { Dice } from "@/app/game/components/dice";
+import { Scoreboard } from "./components/scoreboard";
 
 interface GameSession {
   id: number;
@@ -27,6 +22,7 @@ interface GameState {
   round: number;
   scores: Record<string, number | null>;
   total_score: number;
+  locked_dice: number[];
 }
 
 export const GamePage = () => {
@@ -35,9 +31,9 @@ export const GamePage = () => {
 
     const onLockDice = (index: number) => {
       setLockedDice((prevLocked) =>
-        prevLocked.includes(index) ?
-      prevLocked.filter((i) => i !== index)
-      : [...prevLocked, index]
+        prevLocked.includes(index)
+          ? prevLocked.filter((i) => i !== index)
+          : [...prevLocked, index]
       )
     }
 
@@ -55,6 +51,7 @@ export const GamePage = () => {
 
         const gameData = await startResponse.json();
         setGame(gameData);
+        setLockedDice(gameData.state.locked_dice || [])
 
       } catch (error) {
         console.error("Erreur lors de la création de la session de jeu", error)
@@ -67,7 +64,6 @@ export const GamePage = () => {
       if (!game) {
           toast.warning("Aucune partie chargée...");
         return;
-
       }
 
       try {
@@ -83,6 +79,7 @@ export const GamePage = () => {
 
         const data = await rollResponse.json();
         setGame(data);
+        setLockedDice(data.state.locked_dice || [])
 
         } catch (error) {
           console.error("Erreur lors de la création de la session de jeu", error)
@@ -90,15 +87,35 @@ export const GamePage = () => {
         }
     }
 
+    const score = async (category: string) => {
+      if (!game) {
+          toast.warning("Aucune partie chargée...");
+        return;
+      }
+
+      try {
+        const scoreResponse = await fetch(`${API_URL}/${game.id}/score`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ category }),
+        });
+
+        if (!scoreResponse.ok) {
+          throw new Error("Erreur lors de la sélection de la catégorie");
+        }
+
+        const data = await scoreResponse.json();
+        setGame(data);
+        setLockedDice(data.state.locked_dice || [])
+
+      } catch (error) {
+        console.error(error);
+        toast.error("Impossible d'enregistrer le score");
+      }
+    };
+
     return (
         <Item>
-            <Card>
-                <CardHeader>
-          <CardTitle>
-            🎲 Yahtzee Game
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
           {!game ? (
             <Button onClick={startGame}>
               Démarrer une partie
@@ -113,20 +130,24 @@ export const GamePage = () => {
                       value={value}
                       locked={lockedDice.includes(i)}
                       onToggle={() => onLockDice(i)}
-                    />
-                  ))
-                ) : (
-                  <p className="text-gray-500 italic">Aucun dé lancé</p>
-                )}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-gray-500 italic">Aucun dé lancé</p>
+                  )}
               </div>
+              <Scoreboard
+                dice={game.state.dice_values}
+                scores={game.state.scores}
+                total={game.state.total_score}
+                onSelectCategory={score}
+              />
 
               <Button onClick={rollDice}>
                 🎲 Lancer les dés
               </Button>
             </>
           )}
-        </CardContent>
-            </Card>
         </Item>
     )
 }
