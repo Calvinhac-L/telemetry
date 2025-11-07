@@ -8,6 +8,7 @@ import { Item } from "@/components/ui/item"
 import { API_URL } from "@/lib/api";
 import { Dice } from "@/app/game/components/dice";
 import { Scoreboard } from "./components/scoreboard";
+import DiceScene from "./components/dice-scene";
 
 interface GameSession {
   id: number;
@@ -142,6 +143,7 @@ export const GamePage = () => {
                 total={game.state.total_score}
                 onSelectCategory={score}
               />
+              <DiceScene />
 
               <Button onClick={rollDice}>
                 🎲 Lancer les dés
