@@ -20,7 +20,7 @@ export const Scoreboard = ({
 }: ScoreboardProps) => {
     const potential: Record<string, number> = calculatePossibleScores(dice)
     return (
-        <div className="mt-6 p-4 rounded-lg border border-gray-300 dark:border-gray-700">
+        <div className="mt-6 p-4 rounded-lg border border-orange-300 dark:border-orange-700">
             <h2 className="font-bold text-lg mb-2">📋 Tableau des scores</h2>
 
             <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
@@ -28,7 +28,6 @@ export const Scoreboard = ({
                     const isUsed = value !== null;
                     const potentialValue = potential[category];
                     const showPotential = !isUsed && potentialValue !== 0
-
 
                     return (
                         <motion.div
@@ -41,7 +40,7 @@ export const Scoreboard = ({
                                 onClick={() => !isUsed && onSelectCategory?.(category)}
                                 className={cn(
                                     "flex justify-between w-full text-left py-1 px-2 rounded-md transition-colors",
-                                    isUsed ? "text-gray-500 cursor-not-allowed bg-transparent" : "hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                                    isUsed ? "text-orange-500 cursor-not-allowed bg-transparent" : "hover:bg-orange-100 dark:hover:bg-orange-800 cursor-pointer"
                                 )}
                                 disabled={isUsed}
                                 >
@@ -54,7 +53,7 @@ export const Scoreboard = ({
                                         exit={{ opacity: 0, y: 4 }}
                                         className={cn(
                                             "font-semibold min-w-8 text-right",
-                                            isUsed ? "text-gray-400" : potentialValue === 0 ? "text-gray-400 italic" : "text-gray-500 italic"
+                                            isUsed ? "text-orange-400" : potentialValue === 0 ? "text-orange-400 italic" : "text-orange-500 italic"
                                         )}
                                     >
                                         {isUsed ? value : showPotential ? potentialValue : "-"}

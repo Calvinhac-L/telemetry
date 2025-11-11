@@ -11,6 +11,8 @@
   "dependencies": {
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
+    "@react-spring/three": "^10.0.3",
+    "@react-spring/web": "^10.0.3",
     "@react-three/cannon": "^6.6.0",
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.4.0",
