@@ -7,7 +7,7 @@ import { ScoreCard } from "./score-card";
 import { api } from "@/lib/api";
 import { Game, ScoreCategory } from "@/types/game";
 import { toast } from "sonner";
-import { Dice } from "./dice";
+import { Dice3DScene } from "./dice-3d";
 
 interface GameBoardProps {
   game: Game;
@@ -17,6 +17,7 @@ interface GameBoardProps {
 export const ScoreBoard = ({ game, onGameUpdate }: GameBoardProps) => {
   const [lockedDice, setLockedDice] = useState<number[]>([]);
   const [isRolling, setIsRolling] = useState(false);
+  const [rollIteration, setRollIteration] = useState(0);
 
   const { state } = game;
   const canRoll = state.rolls_left > 0;
@@ -24,6 +25,7 @@ export const ScoreBoard = ({ game, onGameUpdate }: GameBoardProps) => {
 
   const handleRoll = async () => {
     setIsRolling(true);
+    setRollIteration(prev => prev + 1);
     try {
       const updatedGame = await api.rollDice(game.id, lockedDice);
       onGameUpdate(updatedGame);
@@ -76,17 +78,14 @@ export const ScoreBoard = ({ game, onGameUpdate }: GameBoardProps) => {
               )}
             </div>
 
-            <div className="flex justify-center gap-3 py-6">
-              {state.dice_values.map((value, index) => (
-                <Dice
-                  key={index}
-                  value={value}
-                  isLocked={lockedDice.includes(index)}
-                  onToggleLock={() => toggleLock(index)}
-                  disabled={!hasRolled || state.rolls_left === 3 || isGameFinished}
-                />
-              ))}
-            </div>
+            <Dice3DScene
+              values={state.dice_values}
+              locked={lockedDice}
+              onToggleLock={toggleLock}
+              disabled={!hasRolled || state.rolls_left === 3 || isGameFinished}
+              isRolling={isRolling}
+              rollIteration={rollIteration}
+            />
 
             <Button
               onClick={handleRoll}
