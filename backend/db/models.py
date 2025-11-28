@@ -16,7 +16,7 @@ class User(Base):
     email = Column(String)
     created_at = Column(DateTime, default=datetime.now())
 
-    games = relationship("GameSession", back_populates="user")
+    games = relationship("GameSession", back_populates="user", cascade="all, delete-orphan")
 
 
 class GameSession(Base):
