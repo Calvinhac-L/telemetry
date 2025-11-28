@@ -15,9 +15,16 @@ user_router = APIRouter()
 def list_users(db: Session = Depends(get_database)):
     return user_service.list_users(db)
 
-@user_router.post("/user", response_model=UserRead)
+@user_router.post("/user/create", response_model=UserRead)
 def create_user(user: UserCreate, db: Session = Depends(get_database)):
     try:
         return user_service.create_user(db, user)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+@user_router.post("/user/delete", response_model=UserRead)
+def delete_user(user_id: int, db: Session = Depends(get_database)):
+    try:
+        return user_service.delete_user(db, user_id)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
