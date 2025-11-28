@@ -151,7 +151,6 @@ class Game:
             self.game.finished = 1
         else:
             self.state.rolls_left = 3
-            self.state.dice_values = [0, 0, 0, 0, 0]
             self.state.locked_dice = []
 
         self._save_state()

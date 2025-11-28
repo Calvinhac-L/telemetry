@@ -7,7 +7,7 @@ import { ScoreCard } from "./score-card";
 import { api } from "@/lib/api";
 import { Game, ScoreCategory } from "@/types/game";
 import { toast } from "sonner";
-import { Dice3DScene } from "./dice-3d";
+import { DiceSet } from "./dice-set";
 
 interface GameBoardProps {
   game: Game;
@@ -16,30 +16,41 @@ interface GameBoardProps {
 
 export const ScoreBoard = ({ game, onGameUpdate }: GameBoardProps) => {
   const [lockedDice, setLockedDice] = useState<number[]>([]);
-  const [isRolling, setIsRolling] = useState(false);
-  const [rollIteration, setRollIteration] = useState(0);
+  const [isDiceSpinning, setIsDiceSpinning] = useState(false);
+  const [rollDurations, setRollDurations] = useState<number[]>([]);
+
+
+  console.log("Locked Dice:", lockedDice);
 
   const { state } = game;
   const canRoll = state.rolls_left > 0;
   const hasRolled = state.dice_values.some(d => d > 0);
 
   const handleRoll = async () => {
-    setIsRolling(true);
-    setRollIteration(prev => prev + 1);
+    setIsDiceSpinning(true);
+    const durations = Array(5)
+    .fill(0)
+    .map(() => 900 + Math.floor(Math.random() * 300)); // 900–1200ms
+
+    setRollDurations(durations);
     try {
       const updatedGame = await api.rollDice(game.id, lockedDice);
       onGameUpdate(updatedGame);
-      setLockedDice([]);
     } catch (error) {
         console.error(error);
         toast.error("Erreur lors du lancer des dés");
     } finally {
-      setIsRolling(false);
+      const maxDuration = Math.max(...durations);
+      setTimeout(() => {
+        setIsDiceSpinning(false);
+      }, maxDuration);
     }
   };
 
   const toggleLock = (index: number) => {
     if (!hasRolled || state.rolls_left === 3) return;
+
+    console.log("Toggling lock for dice index:", index);
 
     setLockedDice(prev =>
       prev.includes(index)
@@ -78,22 +89,15 @@ export const ScoreBoard = ({ game, onGameUpdate }: GameBoardProps) => {
               )}
             </div>
 
-            <Dice3DScene
-              values={state.dice_values}
-              locked={lockedDice}
-              onToggleLock={toggleLock}
-              disabled={!hasRolled || state.rolls_left === 3 || isGameFinished}
-              isRolling={isRolling}
-              rollIteration={rollIteration}
-            />
+            <DiceSet values={state.dice_values} isSpinning={isDiceSpinning} durations={rollDurations} locked={lockedDice} toggleLock={toggleLock} />
 
             <Button
               onClick={handleRoll}
-              disabled={!canRoll || isRolling || isGameFinished}
+              disabled={!canRoll || isDiceSpinning || isGameFinished}
               className="w-full h-12 text-lg font-bold"
               size="lg"
             >
-              {isRolling ? "Rolling..." : canRoll ? "Roll Dice" : "No Rolls Left"}
+              {isDiceSpinning ? "Rolling..." : canRoll ? "Roll Dice" : "No Rolls Left"}
             </Button>
 
             {hasRolled && !isGameFinished && (
