@@ -4,9 +4,9 @@ Fichier de gestion de la logique d'une session de jeu
 
 from enum import Enum
 from sqlalchemy.orm import Session
-from random import randint
 from typing import List, Dict, Optional
 import collections
+import secrets
 
 from db.models import GameSession, User
 from db.schemas import GameState
@@ -100,11 +100,11 @@ class Game:
     def _roll_dice(self, locked_dice: Optional[List[int]] = None):
         self.state.locked_dice = locked_dice or []
         if locked_dice is None:
-            self.state.dice_values = [randint(1, 6) for _ in range(5)]
+            self.state.dice_values = [secrets.choice(range(1, 6)) for _ in range(5)]
         else:
             for idx in range(5):
                 if idx not in locked_dice:
-                    self.state.dice_values[idx] = randint(1, 6)
+                    self.state.dice_values[idx] = secrets.choice(range(1, 6))
 
     def roll(self, locked_dice: Optional[List[int]] = None) -> GameSession:
         """
@@ -190,7 +190,10 @@ class Game:
         Liste toutes les parties d'un utilisateur.
         """
         return (
-            db.query(GameSession).filter(GameSession.user_id == user_id).order_by(GameSession.created_at.desc()).all()
+            db.query(GameSession)
+            .filter(GameSession.user_id == user_id)
+            .order_by(GameSession.created_at.desc())
+            .all()
         )
 
     # ----------------------------------------------------------------------
@@ -213,7 +216,10 @@ class Game:
     @classmethod
     def _is_small_straight(cls, dice):
         s = set(dice)
-        return any(all(x in s for x in seq) for seq in ([1, 2, 3, 4], [2, 3, 4, 5], [3, 4, 5, 6]))
+        return any(
+            all(x in s for x in seq)
+            for seq in ([1, 2, 3, 4], [2, 3, 4, 5], [3, 4, 5, 6])
+        )
 
     @classmethod
     def _is_large_straight(cls, dice):
