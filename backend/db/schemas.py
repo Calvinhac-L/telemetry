@@ -15,6 +15,8 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     pass
 
+class UserDelete(BaseModel):
+    user_id: int
 
 class UserRead(UserBase):
     id: int

@@ -5,12 +5,21 @@ const API_BASE_URL = 'http://localhost:8000';
 export const api = {
   // User endpoints
   async createUser(username: string, email: string): Promise<User> {
-    const response = await fetch(`${API_BASE_URL}/user`, {
+    const response = await fetch(`${API_BASE_URL}/user/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, email }),
     });
     if (!response.ok) throw new Error('Failed to create user');
+    return response.json();
+  },
+  async deleteUser(user_id: number): Promise<User> {
+    const response = await fetch(`${API_BASE_URL}/user/delete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id }),
+    });
+    if (!response.ok) throw new Error('Failed to delete user');
     return response.json();
   },
 

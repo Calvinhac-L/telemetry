@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { api } from "@/lib/api";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { User } from "@/types/game";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { Trash } from "lucide-react";
 
 interface UserSelectProps {
   onUserSelected: (user: User) => void;
@@ -39,6 +40,17 @@ export const UserSelect = ({ onUserSelected }: UserSelectProps) => {
     },
   });
 
+  const deleteUserMutation = useMutation({
+    mutationFn: (user_id: number) => api.deleteUser(user_id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      toast.success("Utilisateur supprimé");
+    },
+    onError: () => {
+      toast.error("Erreur lors de la suppression");
+    },
+  })
+
   const handleCreateUser = (e: React.FormEvent) => {
     e.preventDefault();
     if (username && email) {
@@ -65,12 +77,20 @@ export const UserSelect = ({ onUserSelected }: UserSelectProps) => {
               <Button
                 key={user.id}
                 variant="outline"
-                className="w-full justify-start h-auto p-4"
+                className="w-full flex items-center justify-between h-auto p-4"
                 onClick={() => onUserSelected(user)}
               >
                 <div className="text-left">
                   <div className="font-semibold">{user.username}</div>
                   <div className="text-sm text-muted-foreground">{user.email}</div>
+                </div>
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteUserMutation.mutate(user.id)}
+                  }
+                  >
+                  <Trash size={24} className="mr-4 text-red-400"/>
                 </div>
               </Button>
             ))}

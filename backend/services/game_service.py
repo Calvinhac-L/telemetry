@@ -246,9 +246,9 @@ class Game:
         if category == "full_house":
             return 25 if cls._is_full_house(dice) else 0
         if category == "small_straight":
-            return 30 if cls._is_small_straight(dice) else 0
+            return 25 if cls._is_small_straight(dice) else 0
         if category == "large_straight":
-            return 40 if cls._is_large_straight(dice) else 0
+            return 35 if cls._is_large_straight(dice) else 0
         if category == "yahtzee":
             return 50 if cls._is_n_of_a_kind(dice, 5) else 0
         if category == "chance":
