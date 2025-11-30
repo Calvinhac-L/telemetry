@@ -28,9 +28,13 @@ class GameState(BaseModel):
     dice_values: list[int]
     rolls_left: int
     round: int
-    scores: dict[str, Optional[int]]
+    scores: dict[str, dict[str, Optional[int]]]
     total_score: int
     locked_dice: list[int] = []
+    dry_roll_used: bool = False
+
+    class Config:
+        from_attributes = True
 
 
 class GameCreate(BaseModel):
@@ -57,4 +61,5 @@ class RollRequest(BaseModel):
 
 
 class ChooseScoreRequest(BaseModel):
+    column: str
     category: str

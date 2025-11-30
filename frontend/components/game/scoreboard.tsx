@@ -59,9 +59,9 @@ export const ScoreBoard = ({ game, onGameUpdate }: GameBoardProps) => {
     );
   };
 
-  const handleChooseScore = async (category: ScoreCategory) => {
+  const handleChooseScore = async (column: "classic" | "ascending" | "descending" | "dry", category: ScoreCategory) => {
     try {
-      const updatedGame = await api.chooseScore(game.id, category);
+      const updatedGame = await api.chooseScore(game.id, column, category);
       onGameUpdate(updatedGame);
       setLockedDice([]);
     } catch (error) {
@@ -115,8 +115,9 @@ export const ScoreBoard = ({ game, onGameUpdate }: GameBoardProps) => {
       <ScoreCard
         scores={state.scores}
         currentDice={hasRolled ? state.dice_values : []}
-        onChooseScore={handleChooseScore}
+        onChooseScore={(column, category) => handleChooseScore(column, category)}
         disabled={!hasRolled || isGameFinished}
+        rollsLeft={state.rolls_left}
       />
     </div>
   );

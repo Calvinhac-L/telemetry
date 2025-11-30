@@ -41,11 +41,11 @@ export const api = {
     return response.json();
   },
 
-  async chooseScore(gameId: number, category: string): Promise<Game> {
+  async chooseScore(gameId: number, column: string, category: string): Promise<Game> {
     const response = await fetch(`${API_BASE_URL}/${gameId}/score`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ category }),
+      body: JSON.stringify({ column, category }),
     });
     if (!response.ok) throw new Error('Failed to choose score');
     return response.json();

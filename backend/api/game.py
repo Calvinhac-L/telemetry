@@ -30,10 +30,12 @@ def roll(game_id: int, payload: RollRequest, db: Session = Depends(get_database)
 
 
 @game_router.post("/{game_id}/score", response_model=GameRead)
-def choose_score(game_id: int, payload: ChooseScoreRequest, db: Session = Depends(get_database)):
+def choose_score(
+    game_id: int, payload: ChooseScoreRequest, db: Session = Depends(get_database)
+):
     try:
         game = game_service.Game(db, game_id)
-        return game.choose_score(payload.category)
+        return game.choose_score(payload.column, payload.category)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

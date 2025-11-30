@@ -28,6 +28,13 @@ class CategoriesEnum(Enum):
     CHANCE = "chance"
 
 
+class ColumnsEnum(Enum):
+    CLASSIC = "classic"
+    ASCENDING = "ascending"
+    DESCENDING = "descending"
+    DRY = "dry"
+
+
 class Game:
     game: GameSession
     state: GameState
@@ -57,8 +64,15 @@ class Game:
             dice_values=[0, 0, 0, 0, 0],
             rolls_left=3,
             round=0,
-            scores={c.value: None for c in CategoriesEnum},
+            scores={
+                "classic": {c.value: None for c in CategoriesEnum},
+                "ascending": {c.value: None for c in CategoriesEnum},
+                "descending": {c.value: None for c in CategoriesEnum},
+                "dry": {c.value: None for c in CategoriesEnum},
+            },
             total_score=0,
+            locked_dice=[],
+            dry_roll_used=False,
         )
 
         # Convertir l'état en dictionnaire avant de le sauvegarder
@@ -116,6 +130,9 @@ class Game:
         if self.state.rolls_left <= 0:
             raise ValueError("No rolls left in this turn")
 
+        if self.state.rolls_left < 2:
+            self.state.dry_roll_used = True
+
         self._roll_dice(locked_dice)
         self.state.rolls_left -= 1
 
@@ -126,32 +143,70 @@ class Game:
     # Choix du score et passage au tour suivant
     # ----------------------------------------------------------------------
 
-    def choose_score(self, category: str) -> GameSession:
+    def _can_fill_column(self, column: str, category: str) -> bool:
+        """
+        Vérifie si une catégorie peut être remplie dans une colonne ascendante ou descendante.
+        """
+        if column == ColumnsEnum.ASCENDING.value:
+            category_order = reversed(CategoriesEnum)
+        elif column == ColumnsEnum.DESCENDING.value:
+            category_order = CategoriesEnum
+        else:
+            return True
+
+        last_filled = next(
+            (
+                i
+                for i, cat in enumerate(category_order)
+                if self.state.scores[column][cat.value] is not None
+            ),
+            -1,
+        )
+        current_index = list(category_order).index(CategoriesEnum(category))
+
+        return current_index == (last_filled + 1 if last_filled != -1 else 0)
+
+    def choose_score(self, column: str, category: str) -> GameSession:
         """
         Attribue le score pour une catégorie et passe au tour suivant.
         """
         if not self.game:
             self._load_game(self.game_id)
 
-        if category not in self.state.scores:
+        if column not in self.state.scores:
+            raise ValueError("Invalid column")
+
+        if category not in self.state.scores[column]:
             raise ValueError("Invalid category")
-        if self.state.scores[category] is not None:
+
+        if self.state.scores[column][category] is not None:
             raise ValueError("Category already used")
+
+        if column == ColumnsEnum.DRY.value and self.state.dry_roll_used:
+            raise ValueError(
+                "Impossible de jouer le sec ! Cette colonne est verrouillée."
+            )
+
+        if column in [
+            ColumnsEnum.ASCENDING.value,
+            ColumnsEnum.DESCENDING.value,
+        ] and not self._can_fill_column(column, category):
+            raise ValueError(f"Cannot fill {category} in {column} column")
 
         dice = self.state.dice_values
         points = self._calculate_score_for_category(category, dice)
 
-        self.state.scores[category] = points
+        self.state.scores[column][category] = points
         self.state.total_score += points
-        self.state.round += 1
 
-        # Fin de partie
-        if self.state.round >= len(self.state.scores):
-            self.state.rolls_left = 0
+        # Tour suivant
+        self.state.round += 1
+        if self.state.round >= len(CategoriesEnum):
             self.game.finished = 1
         else:
             self.state.rolls_left = 3
             self.state.locked_dice = []
+            self.state.dry_roll_used = False
 
         self._save_state()
         return self.game
