@@ -17,8 +17,6 @@ export const DiceSet = ({
     locked,
     toggleLock
 }: DiceSetProps) => {
-    console.log(values)
-
     return (
         <div className="flex gap-4 items-center justify-center">
             {values.map((v, i) => (

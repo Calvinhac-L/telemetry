@@ -19,9 +19,6 @@ export const ScoreBoard = ({ game, onGameUpdate }: GameBoardProps) => {
   const [isDiceSpinning, setIsDiceSpinning] = useState(false);
   const [rollDurations, setRollDurations] = useState<number[]>([]);
 
-
-  console.log("Locked Dice:", lockedDice);
-
   const { state } = game;
   const canRoll = state.rolls_left > 0;
   const hasRolled = state.dice_values.some(d => d > 0);
@@ -49,8 +46,6 @@ export const ScoreBoard = ({ game, onGameUpdate }: GameBoardProps) => {
 
   const toggleLock = (index: number) => {
     if (!hasRolled || state.rolls_left === 3) return;
-
-    console.log("Toggling lock for dice index:", index);
 
     setLockedDice(prev =>
       prev.includes(index)
@@ -117,6 +112,7 @@ export const ScoreBoard = ({ game, onGameUpdate }: GameBoardProps) => {
         currentDice={hasRolled ? state.dice_values : []}
         onChooseScore={handleChooseScore}
         disabled={!hasRolled || isGameFinished}
+        isDiceSpinning={isDiceSpinning}
       />
     </div>
   );
