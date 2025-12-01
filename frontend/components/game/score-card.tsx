@@ -8,7 +8,6 @@ interface ScoreCardProps {
   scores: Record<string, number>;
   currentDice: number[];
   onChooseScore: (category: ScoreCategory) => void;
-  disabled: boolean;
   isDiceSpinning: boolean;
 }
 
@@ -72,7 +71,7 @@ const calculatePotentialScore = (category: ScoreCategory, dice: number[]): numbe
   }
 };
 
-export const ScoreCard = ({ scores, currentDice, onChooseScore, disabled, isDiceSpinning }: ScoreCardProps) => {
+export const ScoreCard = ({ scores, currentDice, onChooseScore, isDiceSpinning }: ScoreCardProps) => {
   const upperCategories: ScoreCategory[] = ['ones', 'twos', 'threes', 'fours', 'fives', 'sixes'];
   const lowerCategories: ScoreCategory[] = [
     'three_of_a_kind', 'four_of_a_kind', 'full_house',
@@ -82,6 +81,16 @@ export const ScoreCard = ({ scores, currentDice, onChooseScore, disabled, isDice
   const upperScore = upperCategories.reduce((sum, cat) =>
     sum + (scores[cat] ?? 0), 0
   );
+
+  const renderPotential = (isDiceSpinning: boolean, potential: number | null) => {
+    if (isDiceSpinning) {
+      return <LoadingSpinner />;
+    } else if (potential !== null) {
+        return <span className={cn(potential > 0 ? "font-black" : "text-gray-400")}>{potential}</span>;
+    } else {
+      return "";
+    }
+  }
 
   const renderCategory = (category: ScoreCategory) => {
     const score = scores[category];
@@ -96,20 +105,18 @@ export const ScoreCard = ({ scores, currentDice, onChooseScore, disabled, isDice
         onClick={() => onChooseScore(category)}
         variant={isUsed ? "default" : "ghost"}
         className={cn(
-          "flex items-center justify-between p-2 rounded-lg border h-full w-full",
+          "flex items-center justify-between border-b rounded-lg h-full w-full",
         )}
       >
         <span className="font-medium text-sm">{CATEGORY_LABELS[category]}</span>
         {isUsed ? (
           <span className="flex items-center justify-center h-8 border-2 rounded-sm font-black border-white aspect-square">{score}</span>
         ) : (
-          <Button
-            size="sm"
-            disabled={disabled}
-            className="flex items-center justify-center aspect-square"
+          <div
+            className="flex h-8 rounded-sm items-center justify-center aspect-square"
           >
-            {isDiceSpinning ? <LoadingSpinner /> : potential !== null && potential >= 0 ? potential : ""}
-          </Button>
+            {renderPotential(isDiceSpinning, potential)}
+          </div>
         )}
       </Button>
     );
