@@ -82,13 +82,15 @@ export const ScoreCard = ({ scores, currentDice, onChooseScore, isDiceSpinning }
     sum + (scores[cat] ?? 0), 0
   );
 
-  const renderPotential = (isDiceSpinning: boolean, potential: number | null) => {
-    if (isDiceSpinning) {
-      return <LoadingSpinner />;
-    } else if (potential !== null) {
-        return <span className={cn(potential > 0 ? "font-black" : "text-gray-400")}>{potential}</span>;
-    } else {
+  const renderLoading = () => {
+    return <LoadingSpinner />
+  }
+
+  const renderPotential = (potential: number | null) => {
+    if (potential == null) {
       return "";
+    } else {
+      return <span className={cn(potential > 0 ? "font-black" : "text-gray-400")}>{potential}</span>;
     }
   }
 
@@ -115,7 +117,7 @@ export const ScoreCard = ({ scores, currentDice, onChooseScore, isDiceSpinning }
           <div
             className="flex h-8 rounded-sm items-center justify-center aspect-square"
           >
-            {renderPotential(isDiceSpinning, potential)}
+            {isDiceSpinning ? renderLoading() : renderPotential(potential)}
           </div>
         )}
       </Button>
