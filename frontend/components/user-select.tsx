@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { api } from "@/lib/api";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { User } from "@/types/game";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { Trash } from "lucide-react";
 
 interface UserSelectProps {
   onUserSelected: (user: User) => void;
@@ -39,6 +40,17 @@ export const UserSelect = ({ onUserSelected }: UserSelectProps) => {
     },
   });
 
+  const deleteUserMutation = useMutation({
+    mutationFn: (user_id: number) => api.deleteUser(user_id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      toast.success("Utilisateur supprimé");
+    },
+    onError: () => {
+      toast.error("Erreur lors de la suppression");
+    },
+  })
+
   const handleCreateUser = (e: React.FormEvent) => {
     e.preventDefault();
     if (username && email) {
@@ -62,17 +74,35 @@ export const UserSelect = ({ onUserSelected }: UserSelectProps) => {
           <h2 className="text-xl font-bold">Select Player</h2>
           <div className="space-y-2">
             {users.map((user) => (
-              <Button
+              <div
                 key={user.id}
-                variant="outline"
-                className="w-full justify-start h-auto p-4"
+                role="button"
+                tabIndex={0}
+                className="
+                  w-full flex items-center justify-between p-6 cursor-pointer
+                  border border-transparent rounded-md
+                  hover:border-gray-200 transition-all
+                "
                 onClick={() => onUserSelected(user)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") onUserSelected(user);
+                }}
               >
                 <div className="text-left">
                   <div className="font-semibold">{user.username}</div>
                   <div className="text-sm text-muted-foreground">{user.email}</div>
                 </div>
-              </Button>
+                <Button
+                  variant={"ghost"}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteUserMutation.mutate(user.id)}
+                  }
+                  className="cursor-pointer hover:bg-red-50 group-hover:border-red-400"
+                >
+                  <Trash size={24} className="text-red-400"/>
+                </Button>
+              </div>
             ))}
           </div>
           <Button

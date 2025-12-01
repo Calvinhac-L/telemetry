@@ -3,6 +3,8 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { ScoreCategory } from "@/types/game";
 import LoadingSpinner from "../loading-spinner";
+import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Grid3X3, HelpCircle, House, Star } from "lucide-react";
+import { ReactNode } from "react";
 
 interface ScoreCardProps {
   scores: Record<string, number>;
@@ -11,20 +13,20 @@ interface ScoreCardProps {
   isDiceSpinning: boolean;
 }
 
-const CATEGORY_LABELS: Record<ScoreCategory, string> = {
-  ones: "Ones",
-  twos: "Twos",
-  threes: "Threes",
-  fours: "Fours",
-  fives: "Fives",
-  sixes: "Sixes",
-  three_of_a_kind: "3 of a Kind",
+const CATEGORY_LABELS: Record<ScoreCategory, ReactNode> = {
+  ones: <Dice1 size={12}/>,
+  twos: <Dice2 size={12}/>,
+  threes: <Dice3 size={12}/>,
+  fours: <Dice4 size={12}/>,
+  fives: <Dice5 size={12}/>,
+  sixes: <Dice6 size={12}/>,
+  three_of_a_kind: <Grid3X3 size={12}/>,
   four_of_a_kind: "4 of a Kind",
-  full_house: "Full House",
-  small_straight: "Small Straight",
+  full_house: <House />,
+  small_straight: "Petite Suite",
   large_straight: "Large Straight",
-  yahtzee: "Yahtzee",
-  chance: "Chance",
+  yahtzee: <Star />,
+  chance: <HelpCircle />,
 };
 
 const calculatePotentialScore = (category: ScoreCategory, dice: number[]): number => {
@@ -53,14 +55,14 @@ const calculatePotentialScore = (category: ScoreCategory, dice: number[]): numbe
       const hasSeq = [[1,2,3,4], [2,3,4,5], [3,4,5,6]].some(seq =>
         seq.every(n => unique.includes(n))
       );
-      return hasSeq ? 30 : 0;
+      return hasSeq ? 25 : 0;
     }
     case 'large_straight': {
       const unique = [...new Set(dice)].sort();
       const hasSeq = [[1,2,3,4,5], [2,3,4,5,6]].some(seq =>
         JSON.stringify(unique) === JSON.stringify(seq)
       );
-      return hasSeq ? 40 : 0;
+      return hasSeq ? 35 : 0;
     }
     case 'yahtzee':
       return Object.values(counts).some(c => c === 5) ? 50 : 0;
@@ -110,7 +112,7 @@ export const ScoreCard = ({ scores, currentDice, onChooseScore, isDiceSpinning }
           "flex items-center justify-between border-b rounded-lg h-full w-full",
         )}
       >
-        <span className="font-medium text-sm">{CATEGORY_LABELS[category]}</span>
+        <span className="flex items-center gap-2 text-sm font-medium">{CATEGORY_LABELS[category]}</span>
         {isUsed ? (
           <span className="flex items-center justify-center h-8 border-2 rounded-sm font-black border-white aspect-square">{score}</span>
         ) : (
@@ -125,14 +127,13 @@ export const ScoreCard = ({ scores, currentDice, onChooseScore, isDiceSpinning }
   };
 
   return (
-    <Card className="p-4 space-y-4">
-      <div>
-        <h3 className="font-bold text-lg mb-3">Upper Section</h3>
-        <div className="flex flex-col gap-4">
+    <Card className="p-4 h-full">
+      <div className="h-full">
+        <div className="flex flex-col gap-1">
           {upperCategories.map(renderCategory)}
-          <div className="pt-2 border-t flex justify-between font-bold">
+          <div className="px-4 py-2 border-b-2 shadow-xs border-black flex justify-between font-bold">
             <span>Upper Total</span>
-            <span>{upperScore}</span>
+            <span className="flex h-8 rounded-sm items-center justify-center aspect-square">{upperScore}</span>
           </div>
           {upperScore >= 63 && (
             <div className="text-sm text-primary flex justify-between">
@@ -144,13 +145,12 @@ export const ScoreCard = ({ scores, currentDice, onChooseScore, isDiceSpinning }
       </div>
 
       <div>
-        <h3 className="font-bold text-lg mb-3">Lower Section</h3>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1">
           {lowerCategories.map(renderCategory)}
         </div>
       </div>
 
-      <div className="pt-3 border-t">
+      <div className="pt-3">
         <div className="flex justify-between text-xl font-bold">
           <span>Total Score</span>
           <span className="text-primary">

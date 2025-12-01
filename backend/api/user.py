@@ -5,7 +5,7 @@ Fichier de définition des routes API pour la gestion des utilisateurs
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from db.schemas import UserCreate, UserRead
+from db.schemas import UserCreate, UserDelete, UserRead
 from services import user_service
 from db.database import get_database
 
@@ -23,8 +23,8 @@ def create_user(user: UserCreate, db: Session = Depends(get_database)):
         raise HTTPException(status_code=422, detail=str(e))
 
 @user_router.post("/user/delete", response_model=UserRead)
-def delete_user(user_id: int, db: Session = Depends(get_database)):
+def delete_user(payload: UserDelete, db: Session = Depends(get_database)):
     try:
-        return user_service.delete_user(db, user_id)
+        return user_service.delete_user(db, payload.user_id)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
