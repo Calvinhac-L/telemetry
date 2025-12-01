@@ -74,25 +74,35 @@ export const UserSelect = ({ onUserSelected }: UserSelectProps) => {
           <h2 className="text-xl font-bold">Select Player</h2>
           <div className="space-y-2">
             {users.map((user) => (
-              <Button
+              <div
                 key={user.id}
-                variant="outline"
-                className="w-full flex items-center justify-between h-auto p-4"
+                role="button"
+                tabIndex={0}
+                className="
+                  w-full flex items-center justify-between p-6 cursor-pointer
+                  border border-transparent rounded-md
+                  hover:border-gray-200 transition-all
+                "
                 onClick={() => onUserSelected(user)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") onUserSelected(user);
+                }}
               >
                 <div className="text-left">
                   <div className="font-semibold">{user.username}</div>
                   <div className="text-sm text-muted-foreground">{user.email}</div>
                 </div>
-                <div
+                <Button
+                  variant={"ghost"}
                   onClick={(e) => {
                     e.stopPropagation();
                     deleteUserMutation.mutate(user.id)}
                   }
-                  >
-                  <Trash size={24} className="mr-4 text-red-400"/>
-                </div>
-              </Button>
+                  className="cursor-pointer hover:bg-red-50 group-hover:border-red-400"
+                >
+                  <Trash size={24} className="text-red-400"/>
+                </Button>
+              </div>
             ))}
           </div>
           <Button
