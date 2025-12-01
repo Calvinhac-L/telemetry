@@ -10,7 +10,6 @@ interface ScoreCardProps {
   scores: Record<string, number>;
   currentDice: number[];
   onChooseScore: (category: ScoreCategory) => void;
-  disabled: boolean;
   isDiceSpinning: boolean;
 }
 
@@ -74,7 +73,7 @@ const calculatePotentialScore = (category: ScoreCategory, dice: number[]): numbe
   }
 };
 
-export const ScoreCard = ({ scores, currentDice, onChooseScore, disabled, isDiceSpinning }: ScoreCardProps) => {
+export const ScoreCard = ({ scores, currentDice, onChooseScore, isDiceSpinning }: ScoreCardProps) => {
   const upperCategories: ScoreCategory[] = ['ones', 'twos', 'threes', 'fours', 'fives', 'sixes'];
   const lowerCategories: ScoreCategory[] = [
     'three_of_a_kind', 'four_of_a_kind', 'full_house',
@@ -84,6 +83,18 @@ export const ScoreCard = ({ scores, currentDice, onChooseScore, disabled, isDice
   const upperScore = upperCategories.reduce((sum, cat) =>
     sum + (scores[cat] ?? 0), 0
   );
+
+  const renderLoading = () => {
+    return <LoadingSpinner />
+  }
+
+  const renderPotential = (potential: number | null) => {
+    if (potential == null) {
+      return "";
+    } else {
+      return <span className={cn(potential > 0 ? "font-black" : "text-gray-400")}>{potential}</span>;
+    }
+  }
 
   const renderCategory = (category: ScoreCategory) => {
     const score = scores[category];
@@ -108,9 +119,7 @@ export const ScoreCard = ({ scores, currentDice, onChooseScore, disabled, isDice
           <div
             className="flex h-8 rounded-sm items-center justify-center aspect-square"
           >
-            {isDiceSpinning ?
-              <LoadingSpinner />
-              : potential == null ? "" : <span className={cn(potential > 0 ? "font-black" : "text-gray-400")}>{potential}</span>}
+            {isDiceSpinning ? renderLoading() : renderPotential(potential)}
           </div>
         )}
       </Button>

@@ -96,7 +96,7 @@ export const ScoreBoard = ({ game, onGameUpdate }: GameBoardProps) => {
             </Button>
 
             {hasRolled && !isGameFinished && (
-              <p className="text-sm text-center text-muted-foreground">
+              <p className="text-sm text-center text-muted-foreground select-none">
                 {state.rolls_left < 3
                   ? "Click dice to lock/unlock them before rolling again"
                   : "Choose a score category or roll again"
@@ -111,7 +111,6 @@ export const ScoreBoard = ({ game, onGameUpdate }: GameBoardProps) => {
         scores={state.scores}
         currentDice={hasRolled ? state.dice_values : []}
         onChooseScore={handleChooseScore}
-        disabled={!hasRolled || isGameFinished}
         isDiceSpinning={isDiceSpinning}
       />
     </div>
