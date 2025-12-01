@@ -9,7 +9,7 @@ export interface GameState {
   dice_values: number[];
   rolls_left: number;
   round: number;
-  scores: Record<string, number | null>;
+  scores: Record<string, number>;
   total_score: number;
   locked_dice: number[];
 }

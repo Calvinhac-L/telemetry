@@ -2,12 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { ScoreCategory } from "@/types/game";
+import LoadingSpinner from "../loading-spinner";
 
 interface ScoreCardProps {
-  scores: Record<string, number | null>;
+  scores: Record<string, number>;
   currentDice: number[];
   onChooseScore: (category: ScoreCategory) => void;
-  disabled: boolean;
+  isDiceSpinning: boolean;
 }
 
 const CATEGORY_LABELS: Record<ScoreCategory, string> = {
@@ -70,7 +71,7 @@ const calculatePotentialScore = (category: ScoreCategory, dice: number[]): numbe
   }
 };
 
-export const ScoreCard = ({ scores, currentDice, onChooseScore, disabled }: ScoreCardProps) => {
+export const ScoreCard = ({ scores, currentDice, onChooseScore, isDiceSpinning }: ScoreCardProps) => {
   const upperCategories: ScoreCategory[] = ['ones', 'twos', 'threes', 'fours', 'fives', 'sixes'];
   const lowerCategories: ScoreCategory[] = [
     'three_of_a_kind', 'four_of_a_kind', 'full_house',
@@ -81,6 +82,18 @@ export const ScoreCard = ({ scores, currentDice, onChooseScore, disabled }: Scor
     sum + (scores[cat] ?? 0), 0
   );
 
+  const renderLoading = () => {
+    return <LoadingSpinner />
+  }
+
+  const renderPotential = (potential: number | null) => {
+    if (potential == null) {
+      return "";
+    } else {
+      return <span className={cn(potential > 0 ? "font-black" : "text-gray-400")}>{potential}</span>;
+    }
+  }
+
   const renderCategory = (category: ScoreCategory) => {
     const score = scores[category];
     const isUsed = score !== null;
@@ -89,28 +102,25 @@ export const ScoreCard = ({ scores, currentDice, onChooseScore, disabled }: Scor
       : null;
 
     return (
-      <div
+      <Button
         key={category}
+        onClick={() => onChooseScore(category)}
+        variant={isUsed ? "default" : "ghost"}
         className={cn(
-          "flex items-center justify-between p-2 rounded-lg border",
-          isUsed ? "bg-muted/50" : "bg-card"
+          "flex items-center justify-between border-b rounded-lg h-full w-full",
         )}
       >
         <span className="font-medium text-sm">{CATEGORY_LABELS[category]}</span>
         {isUsed ? (
-          <span className="font-bold">{score}</span>
+          <span className="flex items-center justify-center h-8 border-2 rounded-sm font-black border-white aspect-square">{score}</span>
         ) : (
-          <Button
-            size="sm"
-            variant={potential && potential > 0 ? "default" : "outline"}
-            onClick={() => onChooseScore(category)}
-            disabled={disabled}
-            className="h-7 min-w-[60px]"
+          <div
+            className="flex h-8 rounded-sm items-center justify-center aspect-square"
           >
-            {potential !== null && potential >= 0 ? potential : "−"}
-          </Button>
+            {isDiceSpinning ? renderLoading() : renderPotential(potential)}
+          </div>
         )}
-      </div>
+      </Button>
     );
   };
 
@@ -118,7 +128,7 @@ export const ScoreCard = ({ scores, currentDice, onChooseScore, disabled }: Scor
     <Card className="p-4 space-y-4">
       <div>
         <h3 className="font-bold text-lg mb-3">Upper Section</h3>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-4">
           {upperCategories.map(renderCategory)}
           <div className="pt-2 border-t flex justify-between font-bold">
             <span>Upper Total</span>
